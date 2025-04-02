@@ -1,5 +1,7 @@
+import React from 'react';
 import { useState } from 'react';
-import { Box, Text, VStack, Button, ScrollView, Progress } from '@gluestack-ui/themed';
+import { Box, Text, VStack, Button, ScrollView, Progress, HStack, Pressable } from '@gluestack-ui/themed';
+import { Ionicons } from '@expo/vector-icons';
 
 type Question = {
   id: number;
@@ -52,7 +54,7 @@ export default function QuizPage() {
 
   const handleAnswer = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
-    
+
     if (answerIndex === questions[currentQuestion].correctAnswer) {
       setScore(score + 1);
     }
@@ -75,64 +77,244 @@ export default function QuizPage() {
   };
 
   return (
-    <ScrollView bg="$backgroundLight0">
-      <VStack space="md" p="$4">
+    <ScrollView bg="$backgroundLight50">
+      <VStack space="lg" p="$4">
         {!showResult ? (
           <>
-            <Box bg="$primary100" p="$4" borderRadius="$lg">
-              <Text size="sm" color="$textDark700">
-                Questão {currentQuestion + 1} de {questions.length}
-              </Text>
-              <Progress value={(currentQuestion + 1) * (100 / questions.length)} mt="$2">
-                <Progress.FilledTrack />
+            {/* Progress Header */}
+            <Box
+              bg="$white"
+              p="$4"
+              borderRadius="$xl"
+              shadowColor="$shadowLight200"
+              shadowOffset={{ width: 0, height: 2 }}
+              shadowOpacity={0.1}
+              shadowRadius={3}
+              elevation={2}
+            >
+              <HStack justifyContent="space-between" alignItems="center" mb="$4">
+                <VStack>
+                  <Text size="sm" color="$textDark600">
+                    Quiz Logosófico
+                  </Text>
+                  <Text size="xl" fontWeight="$bold" color="$textDark900">
+                    Questão {currentQuestion + 1} de {questions.length}
+                  </Text>
+                </VStack>
+                <Box
+                  bg="$primary100"
+                  p="$2"
+                  borderRadius="$lg"
+                >
+                  <Ionicons name="school-outline" size={24} color="#006ADC" />
+                </Box>
+              </HStack>
+
+              <Progress
+                value={(currentQuestion + 1) * (100 / questions.length)}
+                w="100%"
+                h={4}
+                borderRadius="$full"
+                bg="$primary100"
+              >
+                <Progress.FilledTrack
+                  bg="$primary500"
+                  borderRadius="$full"
+                />
               </Progress>
             </Box>
 
-            <Box bg="$white" p="$4" borderRadius="$lg" mt="$4">
+            {/* Question Card */}
+            <Box
+              bg="$white"
+              p="$4"
+              borderRadius="$xl"
+              shadowColor="$shadowLight200"
+              shadowOffset={{ width: 0, height: 2 }}
+              shadowOpacity={0.1}
+              shadowRadius={3}
+              elevation={2}
+            >
               <Text size="lg" fontWeight="$bold" color="$textDark900">
                 {questions[currentQuestion].text}
               </Text>
 
               <VStack space="sm" mt="$4">
                 {questions[currentQuestion].options.map((option, index) => (
-                  <Button
+                  <Pressable
                     key={index}
-                    variant={selectedAnswer === index ? 
-                      (index === questions[currentQuestion].correctAnswer ? 'solid' : 'outline') : 
-                      'outline'
-                    }
-                    bg={
-                      selectedAnswer === index ?
-                        (index === questions[currentQuestion].correctAnswer ? '$success500' : '$error500') :
-                        '$white'
-                    }
-                    onPress={() => handleAnswer(index)}
+                    onPress={() => !selectedAnswer && handleAnswer(index)}
                     disabled={selectedAnswer !== null}
                   >
-                    <Text
-                      color={selectedAnswer === index ? '$white' : '$textDark900'}
+                    <Box
+                      bg={
+                        selectedAnswer === null
+                          ? '$white'
+                          : index === questions[currentQuestion].correctAnswer
+                            ? '$success100'
+                            : selectedAnswer === index
+                              ? '$error100'
+                              : '$white'
+                      }
+                      borderWidth={1}
+                      borderColor={
+                        selectedAnswer === null
+                          ? '$primary200'
+                          : index === questions[currentQuestion].correctAnswer
+                            ? '$success500'
+                            : selectedAnswer === index
+                              ? '$error500'
+                              : '$primary200'
+                      }
+                      p="$4"
+                      borderRadius="$lg"
+                      opacity={selectedAnswer !== null && selectedAnswer !== index && index !== questions[currentQuestion].correctAnswer ? 0.5 : 1}
                     >
-                      {option}
-                    </Text>
-                  </Button>
+                      <HStack space="md" alignItems="center">
+                        <Box
+                          w={24}
+                          h={24}
+                          borderRadius="$full"
+                          bg={
+                            selectedAnswer === null
+                              ? '$primary50'
+                              : index === questions[currentQuestion].correctAnswer
+                                ? '$success500'
+                                : selectedAnswer === index
+                                  ? '$error500'
+                                  : '$primary50'
+                          }
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          <Text
+                            color={
+                              selectedAnswer === null
+                                ? '$primary900'
+                                : index === questions[currentQuestion].correctAnswer
+                                  ? '$white'
+                                  : selectedAnswer === index
+                                    ? '$white'
+                                    : '$primary900'
+                            }
+                          >
+                            {String.fromCharCode(65 + index)}
+                          </Text>
+                        </Box>
+                        <Text
+                          flex={1}
+                          color={
+                            selectedAnswer === null
+                              ? '$textDark900'
+                              : index === questions[currentQuestion].correctAnswer
+                                ? '$success700'
+                                : selectedAnswer === index
+                                  ? '$error700'
+                                  : '$textDark900'
+                          }
+                        >
+                          {option}
+                        </Text>
+                        {selectedAnswer !== null && (
+                          <Ionicons
+                            name={
+                              index === questions[currentQuestion].correctAnswer
+                                ? 'checkmark-circle'
+                                : selectedAnswer === index
+                                  ? 'close-circle'
+                                  : 'radio-button-off'
+                            }
+                            size={24}
+                            color={
+                              index === questions[currentQuestion].correctAnswer
+                                ? '#16A34A'
+                                : selectedAnswer === index
+                                  ? '#DC2626'
+                                  : '#94A3B8'
+                            }
+                          />
+                        )}
+                      </HStack>
+                    </Box>
+                  </Pressable>
                 ))}
               </VStack>
             </Box>
           </>
         ) : (
-          <Box bg="$white" p="$4" borderRadius="$lg">
-            <VStack space="md" alignItems="center">
-              <Text size="2xl" fontWeight="$bold" color="$textDark900">
+          <Box
+            bg="$white"
+            p="$6"
+            borderRadius="$xl"
+            shadowColor="$shadowLight200"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.1}
+            shadowRadius={3}
+            elevation={2}
+          >
+            <VStack space="lg" alignItems="center">
+              <Box
+                bg={score > questions.length / 2 ? '$success100' : '$error100'}
+                p="$4"
+                borderRadius="$full"
+              >
+                <Ionicons
+                  name={score > questions.length / 2 ? 'trophy' : 'refresh'}
+                  size={40}
+                  color={score > questions.length / 2 ? '#16A34A' : '#DC2626'}
+                />
+              </Box>
+
+              <Text size="3xl" fontWeight="$bold" color="$textDark900">
                 Resultado Final
               </Text>
-              <Text size="lg" color="$textDark700">
-                Você acertou {score} de {questions.length} questões!
-              </Text>
-              <Progress value={(score / questions.length) * 100} w="100%" h="$2">
-                <Progress.FilledTrack />
+
+              <Box
+                bg="$primary50"
+                p="$4"
+                borderRadius="$xl"
+                width="100%"
+                alignItems="center"
+              >
+                <Text size="md" color="$textDark600">
+                  Você acertou
+                </Text>
+                <Text size="4xl" fontWeight="$bold" color="$primary900">
+                  {score}/{questions.length}
+                </Text>
+                <Text size="sm" color="$textDark600">
+                  questões
+                </Text>
+              </Box>
+
+              <Progress
+                value={(score / questions.length) * 100}
+                w="100%"
+                h={8}
+                borderRadius="$full"
+                bg="$primary100"
+              >
+                <Progress.FilledTrack
+                  bg={score > questions.length / 2 ? '$success500' : '$error500'}
+                  borderRadius="$full"
+                />
               </Progress>
-              <Button onPress={resetQuiz} mt="$4">
-                <Text color="$white">Tentar Novamente</Text>
+
+              <Button
+                onPress={resetQuiz}
+                size="lg"
+                variant="solid"
+                action="primary"
+                borderRadius="$full"
+                w="100%"
+                mt="$4"
+              >
+                <HStack space="sm" alignItems="center">
+                  <Ionicons name="refresh" size={20} color="white" />
+                  <Text color="$white" fontWeight="$bold">
+                    Tentar Novamente
+                  </Text>
+                </HStack>
               </Button>
             </VStack>
           </Box>
